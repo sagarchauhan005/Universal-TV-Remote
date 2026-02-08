@@ -79,7 +79,7 @@ Use that IP (and port from Wireless debugging if you use it) in the commands bel
 In a terminal (use the project’s env so `adb` is in PATH):
 
 ```bash
-source /Users/sagar/Documents/Development/Apps/SamsungRemote/scripts/env.sh
+source scripts/env.sh   # from project root
 adb pair 192.168.1.5:38472
 ```
 

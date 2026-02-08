@@ -21,7 +21,7 @@ Do these **on your phone** first, then **in Terminal** on your Mac.
 
 **1. Go to project and load env**
 ```bash
-cd /Users/sagar/Documents/Development/Apps/SamsungRemote
+cd /path/to/Universal-TV-Remote   # or your project root
 source scripts/env.sh
 ```
 
