@@ -97,6 +97,16 @@ class SamsungTvModule(reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
+    fun launchApp(appId: String, promise: Promise) {
+        try {
+            val sent = getOrCreateClient().launchApp(appId)
+            promise.resolve(sent)
+        } catch (e: Exception) {
+            promise.reject("LAUNCH_APP_ERROR", e.message, e)
+        }
+    }
+
+    @ReactMethod
     fun isConnected(promise: Promise) {
         try {
             promise.resolve(client?.isConnected() ?: false)

@@ -233,8 +233,16 @@ pip install websocket-client
 # Discover and test Samsung TV
 python3 poc/tv_remote_poc.py
 
+# Validate OTT (Netflix, YouTube, etc.): raw keys + app launch — check TV for response
+python3 poc/tv_remote_poc.py --ott
+
+# Launch app by name or Tizen app ID
+python3 poc/tv_remote_poc.py --launch netflix
+python3 poc/tv_remote_poc.py --launch youtube
+
 # Send specific keys
 python3 poc/tv_remote_poc.py VOLUP VOLDOWN MUTE HOME
+python3 poc/tv_remote_poc.py KEY_NETFLIX KEY_APP_LIST
 ```
 
 ---

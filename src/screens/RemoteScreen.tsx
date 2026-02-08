@@ -12,7 +12,7 @@
  *   6. Power, Menu, Home, Back, Source (bottom — most used)
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -20,13 +20,15 @@ import {
   Pressable,
   Alert,
   TouchableOpacity,
-  NativeModules,
+  TextInput,
   Dimensions,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useTv } from '../context/TvContext';
 import type { StandardRemoteKey, TvBrand } from '../handlers';
+import { charToSamsungKey, type SamsungKey } from '../handlers/samsung/keys';
 
-const { SamsungTvRemote } = NativeModules;
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
 // ─────────────────────────────────────────────────
@@ -44,14 +46,14 @@ const BRAND_ACCENTS: Record<TvBrand, string> = {
 };
 
 // ─────────────────────────────────────────────────
-// App shortcuts
+// App shortcuts — same as POC: app launch by ID (Netflix/YouTube/Spotify) or raw key (Apps/Hotstar)
 // ─────────────────────────────────────────────────
 
-const APP_SHORTCUTS = [
-  { label: 'Netflix',  color: '#E50914', key: 'KEY_NETFLIX' },
-  { label: 'YouTube',  color: '#FF0000', key: 'KEY_YOUTUBE' },
-  { label: 'Hotstar',  color: '#1F49C7', key: 'KEY_HDMI3' },
-  { label: 'Spotify',  color: '#1DB954', key: 'KEY_HDMI4' },
+const APP_SHORTCUTS: Array<{ label: string; color: string; appId?: string; key?: string }> = [
+  { label: 'Netflix',  color: '#E50914', appId: '3201907018807' },
+  { label: 'YouTube',  color: '#FF0000', appId: '111299001912' },
+  { label: 'Hotstar',  color: '#1F49C7', key: 'KEY_APP_LIST' },
+  { label: 'Spotify',  color: '#1DB954', appId: '3201606009684' },
   { label: 'Apps',     color: '#484f58', key: 'KEY_APP_LIST' },
 ];
 
@@ -80,21 +82,50 @@ function Btn({
 
 export function RemoteScreen() {
   const {
-    connectedDevice, disconnect, sendKey,
+    connectedDevice, disconnect, sendKey, sendRawKey, launchApp,
     connectionState, supportedKeyGroups,
   } = useTv();
 
   const [showNumpad, setShowNumpad] = useState(true);
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [searchText, setSearchText] = useState('');
 
   const brand = connectedDevice?.brand || 'unknown';
   const accentColor = BRAND_ACCENTS[brand];
   const isOn = connectionState === 'connected';
   const hasGroup = (g: string) => supportedKeyGroups.includes(g as any);
   const k = (key: StandardRemoteKey) => () => sendKey(key);
+  const supportsRawKeys = connectedDevice?.brand === 'samsung_tizen';
 
   const sendRaw = (key: string) => () => {
-    if (SamsungTvRemote?.sendKey) { SamsungTvRemote.sendKey(key).catch(() => {}); }
+    sendRawKey(key).catch(() => {});
   };
+
+  const onOttPress = (app: typeof APP_SHORTCUTS[0]) => () => {
+    if (app.appId) {
+      launchApp(app.appId).catch(() => {});
+    } else if (app.key) {
+      sendRawKey(app.key).catch(() => {});
+    }
+  };
+
+  const sendSearchToTv = useCallback(async () => {
+    if (!searchText.trim()) return;
+    const keys: SamsungKey[] = [];
+    for (const ch of searchText) {
+      const key = charToSamsungKey(ch);
+      if (key) keys.push(key);
+    }
+    for (const key of keys) {
+      await sendRawKey(key);
+      await new Promise<void>((resolve) => setTimeout(resolve, 80));
+    }
+    setSearchText('');
+  }, [searchText, sendRawKey]);
+
+  const sendBackspace = useCallback(() => {
+    sendRawKey('KEY_DELETE').catch(() => {});
+  }, [sendRawKey]);
 
   const handleDisconnect = () => {
     Alert.alert('Disconnect', `Disconnect from ${connectedDevice?.name || 'TV'}?`, [
@@ -165,19 +196,64 @@ export function RemoteScreen() {
           </View>
         )}
 
-        {/* App shortcuts */}
-        <View style={styles.appsRow}>
-          {APP_SHORTCUTS.map(app => (
+        {/* App shortcuts (Samsung: Netflix, YouTube, etc.) */}
+        {supportsRawKeys && (
+          <View style={styles.appsRow}>
+            {APP_SHORTCUTS.map(app => (
+              <TouchableOpacity
+                key={app.label}
+                style={[styles.appBtn, { backgroundColor: app.color }]}
+                onPress={onOttPress(app)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.appBtnText}>{app.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {/* Search / Keyboard — type and send to TV (e.g. Netflix/YouTube search) */}
+        {supportsRawKeys && isOn && (
+          <View style={styles.keyboardSection}>
             <TouchableOpacity
-              key={app.label}
-              style={[styles.appBtn, { backgroundColor: app.color }]}
-              onPress={sendRaw(app.key)}
+              style={styles.keyboardToggle}
+              onPress={() => setShowKeyboard((v) => !v)}
               activeOpacity={0.7}
             >
-              <Text style={styles.appBtnText}>{app.label}</Text>
+              <Text style={styles.keyboardToggleText}>
+                {showKeyboard ? '\u25BC Search' : '\u25B6 Search / Keyboard'}
+              </Text>
             </TouchableOpacity>
-          ))}
-        </View>
+            {showKeyboard && (
+              <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                style={styles.keyboardBox}
+              >
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Type to search on TV (A–Z, 0–9)"
+                  placeholderTextColor="#6e7681"
+                  value={searchText}
+                  onChangeText={setSearchText}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  maxLength={100}
+                />
+                <View style={styles.keyboardActions}>
+                  <Pressable style={[styles.keyboardBtn, styles.backspaceBtn]} onPress={sendBackspace}>
+                    <Text style={styles.keyboardBtnText}>Backspace</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.keyboardBtn, { backgroundColor: accentColor }]}
+                    onPress={sendSearchToTv}
+                  >
+                    <Text style={[styles.keyboardBtnText, { color: '#fff' }]}>Send to TV</Text>
+                  </Pressable>
+                </View>
+              </KeyboardAvoidingView>
+            )}
+          </View>
+        )}
 
         {/* D-Pad */}
         {hasGroup('navigation') && (
@@ -337,6 +413,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   appBtnText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+
+  // ── Search / Keyboard ──
+  keyboardSection: { marginBottom: 10 },
+  keyboardToggle: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#21262d',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#30363d',
+  },
+  keyboardToggleText: { color: '#c9d1d9', fontSize: 13, fontWeight: '600' },
+  keyboardBox: { marginTop: 8, gap: 8 },
+  searchInput: {
+    height: 44,
+    backgroundColor: '#161b22',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#30363d',
+    paddingHorizontal: 12,
+    color: '#e6edf3',
+    fontSize: 15,
+  },
+  keyboardActions: { flexDirection: 'row', gap: 8 },
+  keyboardBtn: {
+    flex: 1,
+    height: 42,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#21262d',
+    borderWidth: 1,
+    borderColor: '#30363d',
+  },
+  backspaceBtn: { borderColor: '#da3633' },
+  keyboardBtnText: { color: '#c9d1d9', fontWeight: '600', fontSize: 13 },
 
   // ── D-Pad ──
   dpad: {

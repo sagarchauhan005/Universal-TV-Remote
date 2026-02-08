@@ -716,5 +716,19 @@ class SamsungTvClient(
         }
     }
 
+    /** Launch app by Tizen app ID (same as POC: ms.channel.emit + ed.apps.launch). */
+    fun launchApp(appId: String): Boolean {
+        val output = rawOutputStream ?: return false
+        val payload = """{"method":"ms.channel.emit","params":{"event":"ed.apps.launch","to":"host","data":{"action_type":"DEEP_LINK","appId":"$appId","metaTag":""}}}"""
+        return try {
+            sendWebSocketFrame(output, payload)
+            Log.d(TAG, "Launch app: $appId")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to launch app: ${e.message}")
+            false
+        }
+    }
+
     fun isConnected(): Boolean = rawWebSocket != null && !(rawWebSocket?.isClosed ?: true)
 }

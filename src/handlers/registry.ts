@@ -275,6 +275,22 @@ class HandlerRegistry {
     return this.activeHandler.sendKey(key);
   }
 
+  /** Send a raw key code (e.g. KEY_NETFLIX). No-op if handler does not support it. */
+  async sendRawKey(key: string): Promise<boolean> {
+    if (!this.activeHandler || typeof this.activeHandler.sendRawKey !== 'function') {
+      return false;
+    }
+    return this.activeHandler.sendRawKey(key);
+  }
+
+  /** Launch app by ID (same as POC). No-op if handler does not support it. */
+  async launchApp(appId: string): Promise<boolean> {
+    if (!this.activeHandler || typeof this.activeHandler.launchApp !== 'function') {
+      return false;
+    }
+    return this.activeHandler.launchApp(appId);
+  }
+
   /** Get supported keys for the current handler. */
   getSupportedKeys(): StandardRemoteKey[] {
     return this.activeHandler?.getSupportedKeys() ?? [];

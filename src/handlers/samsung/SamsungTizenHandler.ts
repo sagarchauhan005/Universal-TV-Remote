@@ -145,6 +145,26 @@ export class SamsungTizenHandler implements TvHandler {
     }
   }
 
+  async sendRawKey(key: string): Promise<boolean> {
+    if (Platform.OS !== 'android' || !SamsungTvRemote) { return false; }
+    try {
+      return await SamsungTvRemote.sendKey(key);
+    } catch {
+      return false;
+    }
+  }
+
+  async launchApp(appId: string): Promise<boolean> {
+    if (Platform.OS !== 'android' || typeof SamsungTvRemote?.launchApp !== 'function') {
+      return false;
+    }
+    try {
+      return await SamsungTvRemote.launchApp(appId);
+    } catch {
+      return false;
+    }
+  }
+
   getSupportedKeys(): StandardRemoteKey[] {
     return SAMSUNG_SUPPORTED_KEYS;
   }

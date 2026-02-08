@@ -183,6 +183,17 @@ export interface TvHandler {
    */
   sendKey(key: StandardRemoteKey): Promise<boolean>;
 
+  /**
+   * Send a raw key code to the TV (e.g. KEY_NETFLIX, KEY_APP_LIST).
+   * Optional; only Samsung and other handlers that support app shortcuts implement this.
+   */
+  sendRawKey?(key: string): Promise<boolean>;
+
+  /**
+   * Launch app by Tizen app ID (ed.apps.launch). Same as POC. Optional.
+   */
+  launchApp?(appId: string): Promise<boolean>;
+
   /** Returns the list of standard keys this handler supports. */
   getSupportedKeys(): StandardRemoteKey[];
 

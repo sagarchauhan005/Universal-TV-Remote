@@ -14,6 +14,7 @@ export interface SamsungTvNativeModule {
   connect: (ip: string) => Promise<void>;
   disconnect: () => Promise<void>;
   sendKey: (key: string) => Promise<boolean>;
+  launchApp: (appId: string) => Promise<boolean>;
   isConnected: () => Promise<boolean>;
   getLastConnectedIp: () => Promise<string | null>;
   getNetworkInfo: () => Promise<NetworkInfo>;

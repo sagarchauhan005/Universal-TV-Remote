@@ -71,3 +71,24 @@ export const SAMSUNG_SUPPORTED_GROUPS: RemoteKeyGroup[] = [
 /** All standard keys are supported by Samsung. */
 export const SAMSUNG_SUPPORTED_KEYS: StandardRemoteKey[] =
   Object.keys(SAMSUNG_KEY_MAP) as StandardRemoteKey[];
+
+// ─────────────────────────────────────────────────────────────
+// Raw keys for app shortcuts and keyboard input
+// ─────────────────────────────────────────────────────────────
+
+/** Samsung raw key code (e.g. KEY_NETFLIX, KEY_A). */
+export type SamsungKey = string;
+
+/**
+ * Map a single character to a Samsung key code for on-screen keyboard/search.
+ * Returns null if the character is not supported.
+ * Used to type in TV app UIs (Netflix, YouTube search, etc.).
+ */
+export function charToSamsungKey(ch: string): SamsungKey | null {
+  if (ch.length !== 1) return null;
+  const c = ch.toUpperCase();
+  if (c >= 'A' && c <= 'Z') return `KEY_${c}`;
+  if (ch >= '0' && ch <= '9') return `KEY_${ch}`;
+  if (ch === ' ') return 'KEY_SPACE';
+  return null;
+}

@@ -30,6 +30,8 @@ interface TvContextValue {
 
   // Remote control
   sendKey: (key: StandardRemoteKey) => Promise<void>;
+  sendRawKey: (key: string) => Promise<void>;
+  launchApp: (appId: string) => Promise<void>;
   supportedKeys: StandardRemoteKey[];
   supportedKeyGroups: RemoteKeyGroup[];
 
@@ -158,6 +160,22 @@ export function TvProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const sendRawKey = useCallback(async (key: string) => {
+    try {
+      await registry.sendRawKey(key);
+    } catch (err: any) {
+      console.warn(`[TvContext] sendRawKey(${key}) failed:`, err?.message);
+    }
+  }, []);
+
+  const launchApp = useCallback(async (appId: string) => {
+    try {
+      await registry.launchApp(appId);
+    } catch (err: any) {
+      console.warn(`[TvContext] launchApp(${appId}) failed:`, err?.message);
+    }
+  }, []);
+
   // ───────────────────────────────────────────
   // Cleanup on unmount
   // ───────────────────────────────────────────
@@ -177,6 +195,8 @@ export function TvProvider({ children }: { children: React.ReactNode }) {
     connect,
     disconnect,
     sendKey,
+    sendRawKey,
+    launchApp,
     supportedKeys,
     supportedKeyGroups,
     errorMessage,
