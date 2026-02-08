@@ -26,7 +26,7 @@ import { SamsungTizenHandler } from './samsung/SamsungTizenHandler';
 
 const { SamsungTvRemote } = NativeModules;
 
-class HandlerRegistry {
+export class HandlerRegistry {
   private handlers: TvHandler[] = [];
   private activeHandler: TvHandler | null = null;
   private activeDevice: TvDevice | null = null;

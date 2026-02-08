@@ -17,6 +17,7 @@ The remote UI is **deliberately minimal**: instead of cramming every possible bu
 - **Quick reconnect** — Remembers your last TV for instant re-connection
 - **Manual IP** — Enter a TV's IP address if auto-discovery doesn't find it
 - **Full remote** — Power, navigation (D-pad), volume, channels, number pad, and media transport controls
+- **App shortcuts** — Netflix, YouTube, Hotstar, Spotify, and Voice (placeholder for future)
 - **Token persistence** — Pair once, connect automatically next time (Samsung)
 - **Modular handler system** — Extensible architecture makes it easy to add support for any TV brand
 
@@ -108,7 +109,21 @@ npx react-native run-android
 2. Tap **Search for TVs** — discovered TVs appear with brand, model, and IP
 3. Tap **Connect** on your TV
 4. **First time only (Samsung):** Accept the pairing prompt on the TV screen
-5. Use the remote controls!
+5. Use the remote: D-pad, volume, channels, number pad, and app shortcuts (Netflix, YouTube, Hotstar, Spotify, Voice). Voice is a placeholder for a future update.
+
+### Tests
+
+Unit tests cover the handler layer (key mappings, registry, Samsung Tizen handler):
+
+```bash
+npm test
+```
+
+Tests live in `__tests__/handlers/` and validate:
+
+- **keys.test.ts** — Samsung key map has every standard key, maps to `KEY_*` codes, supported keys/groups are consistent
+- **registry.test.ts** — Handler registration, connect/sendKey/sendRawKey/launchApp delegation, disconnect
+- **SamsungTizenHandler.test.ts** — `identify()` (REST probe), `sendKey`/`sendRawKey`/`launchApp` delegation to native module, supported keys/groups
 
 ---
 
@@ -233,12 +248,12 @@ pip install websocket-client
 # Discover and test Samsung TV
 python3 poc/tv_remote_poc.py
 
-# Validate OTT (Netflix, YouTube, etc.): raw keys + app launch — check TV for response
+# Validate OTT (Netflix via KEY_NETFLIX, YouTube/Spotify via app launch, etc.)
 python3 poc/tv_remote_poc.py --ott
 
-# Launch app by name or Tizen app ID
-python3 poc/tv_remote_poc.py --launch netflix
+# Launch app by name or Tizen app ID (YouTube, Spotify; Netflix uses KEY_NETFLIX in the app)
 python3 poc/tv_remote_poc.py --launch youtube
+python3 poc/tv_remote_poc.py --launch spotify
 
 # Send specific keys
 python3 poc/tv_remote_poc.py VOLUP VOLDOWN MUTE HOME
