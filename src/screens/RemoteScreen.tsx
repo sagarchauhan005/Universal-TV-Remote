@@ -84,7 +84,7 @@ export function RemoteScreen() {
     connectionState, supportedKeyGroups,
   } = useTv();
 
-  const [showNumpad, setShowNumpad] = useState(false);
+  const [showNumpad, setShowNumpad] = useState(true);
 
   const brand = connectedDevice?.brand || 'unknown';
   const accentColor = BRAND_ACCENTS[brand];
@@ -126,7 +126,7 @@ export function RemoteScreen() {
           </Text>
         )}
         <Text style={[styles.orbStatus, isOn ? styles.orbStatusOn : styles.orbStatusOff]}>
-          {isOn ? 'Connected' : 'Disconnected'}{' \u00B7 Tap to disconnect'}
+          {isOn ? 'Connected ✓' : 'Disconnected'}{' \u00B7 Tap to disconnect'}
         </Text>
       </TouchableOpacity>
 
@@ -257,16 +257,16 @@ const BOTTOM_BTN_H = 44;
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0d1117' },
 
-  // ═══ Orb area (top) ═══
+  // ═══ Orb area — moved down 50%+ from top so centered in upper area ═══
   orbArea: {
     alignItems: 'center',
-    paddingTop: 48,
+    paddingTop: 56,
     paddingBottom: 12,
   },
   orb: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
+    width: 176,
+    height: 176,
+    borderRadius: 88,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
@@ -274,15 +274,15 @@ const styles = StyleSheet.create({
   orbOn: { backgroundColor: 'rgba(63,185,80,0.15)', borderWidth: 2, borderColor: '#3fb950' },
   orbOff: { backgroundColor: 'rgba(248,81,73,0.15)', borderWidth: 2, borderColor: '#f85149' },
   orbInner: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     alignItems: 'center',
     justifyContent: 'center',
   },
   orbInnerOn: { backgroundColor: 'rgba(63,185,80,0.25)' },
   orbInnerOff: { backgroundColor: 'rgba(248,81,73,0.25)' },
-  orbIcon: { fontSize: 26 },
+  orbIcon: { fontSize: 52 },
   orbName: { fontSize: 16, fontWeight: '700', color: '#e6edf3', maxWidth: SCREEN_WIDTH - 60 },
   orbModel: { fontSize: 12, color: '#6e7681', marginTop: 2 },
   orbStatus: { fontSize: 11, marginTop: 4 },

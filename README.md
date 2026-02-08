@@ -2,6 +2,14 @@
 
 An open-source, modular smart TV remote control app built with React Native. Discover and control smart TVs on your local Wi-Fi network from your phone.
 
+## Screenshots
+
+| Discovery | Remote |
+|-----------|--------|
+| ![Discovery screen](images/universal-tv-remote-home.jpeg) | ![Remote screen](images/universal-tv-remote-screen.jpeg) |
+
+The remote UI is **deliberately minimal**: instead of cramming every possible button onto the screen, it shows only the controls you use most on a smart TV—power, D-pad navigation, volume, home, back, and media transport. That keeps the layout uncluttered and one-handed friendly, so you can change channels or open apps without hunting for tiny keys.
+
 ## Features
 
 - **Auto-discovery** — Scans your local network via SSDP to find smart TVs automatically

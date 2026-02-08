@@ -45,7 +45,7 @@ class SamsungTvClient(
         private const val SAMSUNG_URN = "urn:samsung.com:device:RemoteControlReceiver:1"
         private const val DIAL_URN = "urn:dial-multiscreen-org:service:dial:1"
         private const val SSDP_ALL = "ssdp:all"
-        private const val APP_NAME = "SamsungRemote"
+        private const val APP_NAME = "Universal TV Remote"
         private const val REMOTE_PORT_WSS = 8002
         private const val REMOTE_PORT_WS = 8001
         private const val SEARCH_TIMEOUT_MS = 4000

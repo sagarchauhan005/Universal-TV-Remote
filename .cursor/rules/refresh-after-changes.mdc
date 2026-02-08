@@ -1,0 +1,19 @@
+---
+description: ALWAYS run refresh after any app change so the user sees updates on device
+globs: App.tsx,**/src/**/*.{ts,tsx,js,jsx},**/android/**/*.{kt,xml},**/ios/**/*.{swift,storyboard,plist}
+alwaysApply: true
+---
+
+# React Native app refresh (REQUIRED)
+
+**You MUST run the refresh script after EVERY change to app/UI/native code** so the user can see updates on their device. Do not skip this step.
+
+After editing any of: `App.tsx`, `src/**`, `android/`, `ios/`, `package.json`, or config that affects the app:
+
+1. Save your edits.
+2. Run from project root:
+   ```bash
+   ./scripts/refresh-app.sh
+   ```
+
+This starts Metro with a clean cache, installs the app on the connected device, and force-restarts the app so the latest bundle loads. The user needs to see changes immediately—always refresh after making them.
