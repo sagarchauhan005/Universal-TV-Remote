@@ -6,6 +6,7 @@ Connects to Samsung Smart TV via WebSocket and sends remote key commands.
 
 import json
 import base64
+import os
 import ssl
 import sys
 import time
@@ -13,9 +14,9 @@ import socket
 import websocket
 
 # ──────────────────────────────────────────
-# Configuration
+# Configuration (set TV_IP env var or pass as first arg)
 # ──────────────────────────────────────────
-TV_IP = "192.168.1.2"
+TV_IP = os.environ.get("TV_IP", "192.168.1.2")
 APP_NAME = "SamsungRemotePOC"
 WS_PORT = 8002  # secure (wss), also try 8001 (ws) if issues
 TOKEN_FILE = "poc/.tv_token"

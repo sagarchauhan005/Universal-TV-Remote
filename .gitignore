@@ -87,3 +87,6 @@ poc/.tv_token
 *.tmp
 *.temp
 .turbo
+
+# Internal / not for open source
+scripts/Agents.md
